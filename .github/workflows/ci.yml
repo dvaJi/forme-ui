@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: Typecheck the published source
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      # pnpm installed with npm rather than through pnpm/action-setup or corepack.
+      #
+      # `pnpm/action-setup` also switches on setup-node's package-manager cache,
+      # which is keyed on a lockfile this repository does not ship: it publishes
+      # source, not a package, and resolves fresh on each run. Without one,
+      # setup-node fails the step outright instead of skipping the cache.
+      #
+      # Corepack has the same problem from the other side: it reads
+      # `packageManager` from package.json and expects a matching pnpm already on
+      # PATH. Installing the exact pinned version is the one approach that needs
+      # neither a lockfile nor a second moving part.
+      - name: Install pnpm
+        run: npm install --global pnpm@11.15.1
+
+      - run: pnpm install
+
+      # The point of this check: every file in `registry/` is real, installable
+      # source, so it has to compile against its own declared dependencies. This
+      # is what caught the payload shipping a `metadata.ts` that imported a
+      # package that does not exist in this repository, with nothing in the
+      # monorepo able to see it.
+      - run: pnpm typecheck

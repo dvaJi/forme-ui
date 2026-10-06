@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card",
+  "type": "registry:ui",
+  "title": "Card",
+  "description": "A bordered surface with a header, title, description, content and footer you compose yourself, so a card is never more structure than the content inside it needs. Everything reads from the foundation tokens, which makes it retheme with the rest of the library.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "layout"
+  ],
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/card/card.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/card/card.tsx",
+      "content": "import type { ComponentProps } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport function Card({ className, ...props }: ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"card\"\n      className={cn(\n        \"flex flex-col gap-6 rounded-xl border border-border bg-card py-6 text-card-foreground shadow-xs\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function CardHeader({ className, ...props }: ComponentProps<\"div\">) {\n  return <div data-slot=\"card-header\" className={cn(\"grid gap-1.5 px-6\", className)} {...props} />;\n}\n\nexport function CardTitle({ className, ...props }: ComponentProps<\"h3\">) {\n  return (\n    // The heading text arrives as children from the caller, which the linter\n    // cannot see through the spread.\n    // oxlint-disable-next-line jsx-a11y/heading-has-content\n    <h3\n      data-slot=\"card-title\"\n      className={cn(\"text-base leading-tight font-semibold\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function CardDescription({ className, ...props }: ComponentProps<\"p\">) {\n  return (\n    <p\n      data-slot=\"card-description\"\n      className={cn(\"text-sm text-muted-foreground\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function CardContent({ className, ...props }: ComponentProps<\"div\">) {\n  return <div data-slot=\"card-content\" className={cn(\"px-6\", className)} {...props} />;\n}\n\nexport function CardFooter({ className, ...props }: ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"card-footer\"\n      className={cn(\"flex items-center gap-2 px-6\", className)}\n      {...props}\n    />\n  );\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/card",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "layout",
+    "keywords": [
+      "card",
+      "panel",
+      "surface",
+      "container",
+      "section",
+      "shadcn card"
+    ]
+  }
+}

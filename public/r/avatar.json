@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "avatar",
+  "type": "registry:ui",
+  "title": "Avatar",
+  "description": "A user image with a fallback that shows initials while the image loads, and when it never arrives at all. Built on the Base UI avatar primitive, so the image and the fallback swap without a flash of empty space.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "data-display"
+  ],
+  "dependencies": [
+    "@base-ui-components/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/avatar/avatar.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/avatar/avatar.tsx",
+      "content": "import { Avatar as AvatarPrimitive } from \"@base-ui-components/react/avatar\";\nimport type { ComponentProps } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport type AvatarSize = \"sm\" | \"md\" | \"lg\";\n\nexport interface AvatarProps extends ComponentProps<typeof AvatarPrimitive.Root> {\n  size?: AvatarSize;\n}\n\n/**\n * 28 / 36 / 48. Three steps rather than a continuous scale: these are the sizes an\n * avatar appears at in a list row, a header and a profile card, and a fourth step\n * is a size nothing in a real product uses.\n */\nconst sizes = {\n  sm: \"size-7 text-[0.625rem]\",\n  md: \"size-9 text-xs\",\n  lg: \"size-12 text-sm\",\n} satisfies Record<AvatarSize, string>;\n\nexport function Avatar({ className, size = \"md\", ...props }: AvatarProps) {\n  return (\n    <AvatarPrimitive.Root\n      data-slot=\"avatar\"\n      className={cn(\"relative flex shrink-0 overflow-hidden rounded-full\", sizes[size], className)}\n      {...props}\n    />\n  );\n}\n\nexport function AvatarImage({ className, ...props }: ComponentProps<typeof AvatarPrimitive.Image>) {\n  return (\n    <AvatarPrimitive.Image\n      data-slot=\"avatar-image\"\n      className={cn(\"aspect-square size-full object-cover\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function AvatarFallback({\n  className,\n  delay,\n  ...props\n}: ComponentProps<typeof AvatarPrimitive.Fallback>) {\n  return (\n    <AvatarPrimitive.Fallback\n      data-slot=\"avatar-fallback\"\n      // Base UI's own default delay. Spelled out because it is load-bearing: with\n      // no delay the initials flash for every avatar on a page whose images are\n      // cached, which reads as a flicker rather than as a placeholder.\n      delay={delay ?? 0}\n      className={cn(\n        \"grid size-full place-items-center bg-accent font-semibold uppercase text-accent-foreground\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\n/** `\"Francesca Rossi\"` becomes `\"FR\"`, so a fallback needs no per-person JSX. */\nexport function avatarInitials(name: string): string {\n  const letters = name\n    .trim()\n    .split(/\\s+/)\n    .slice(0, 2)\n    .map((part) => part.charAt(0).toUpperCase());\n\n  return letters.join(\"\") || \"?\";\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/avatar",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "data-display",
+    "keywords": [
+      "avatar",
+      "profile picture",
+      "user image",
+      "initials",
+      "fallback",
+      "shadcn avatar"
+    ]
+  }
+}

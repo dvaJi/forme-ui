@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "type": "registry:ui",
+  "title": "Badge",
+  "description": "A small label for status, counts and metadata, in five quiet variants and two sizes. The colour lives in the tint so the text stays readable at eleven pixels, and an icon or a dot inside the badge carries the state at a glance.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "data-display"
+  ],
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/badge/badge.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/badge/badge.tsx",
+      "content": "import type { ComponentProps } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport type BadgeVariant = \"neutral\" | \"brand\" | \"success\" | \"warning\" | \"destructive\";\nexport type BadgeSize = \"sm\" | \"md\";\n\nexport interface BadgeProps extends ComponentProps<\"span\"> {\n  variant?: BadgeVariant;\n  size?: BadgeSize;\n}\n\n// Chromatic badges are a tint with ink text rather than a coloured label: at\n// eleven pixels a saturated chip reads as decoration, not information. Put a\n// dot or an icon inside the badge when the state has to be obvious at a glance.\nconst variants = {\n  neutral: \"border-transparent bg-secondary text-secondary-foreground\",\n  brand: \"border-transparent bg-brand-subtle text-brand-strong\",\n  success: \"border-success/25 bg-success/10 text-foreground\",\n  warning: \"border-warning/25 bg-warning/10 text-foreground\",\n  destructive: \"border-destructive/25 bg-destructive/10 text-foreground\",\n} satisfies Record<BadgeVariant, string>;\n\nconst sizes = {\n  sm: \"h-5 gap-1 px-1.5 text-[0.6875rem] leading-none\",\n  md: \"h-6 gap-1.5 px-2 text-xs leading-none\",\n} satisfies Record<BadgeSize, string>;\n\nexport function Badge({ className, variant = \"neutral\", size = \"md\", ...props }: BadgeProps) {\n  return (\n    <span\n      data-slot=\"badge\"\n      className={cn(\n        \"inline-flex items-center rounded-full border font-medium whitespace-nowrap transition-colors [&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0\",\n        variants[variant],\n        sizes[size],\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/badge",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "data-display",
+    "keywords": [
+      "badge",
+      "chip",
+      "pill",
+      "status label",
+      "tag",
+      "shadcn badge"
+    ]
+  }
+}

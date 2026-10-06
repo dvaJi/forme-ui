@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hero",
+  "type": "registry:block",
+  "title": "Hero",
+  "description": "A marketing hero with an eyebrow, a headline, a supporting paragraph, two calls to action and a frame for a real product screenshot. Every part is composed by you, so the section carries your copy instead of a placeholder.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "marketing"
+  ],
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/blocks/hero/hero.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/blocks/hero/hero.tsx",
+      "content": "import type { ComponentProps } from \"react\";\n\nimport { cn } from \"../../lib/cn\";\n\nexport function Hero({ className, ...props }: ComponentProps<\"section\">) {\n  return (\n    <section\n      data-slot=\"hero\"\n      className={cn(\n        \"mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-4 py-16 text-center sm:py-24\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function HeroEyebrow({ className, ...props }: ComponentProps<\"p\">) {\n  return (\n    <p\n      data-slot=\"hero-eyebrow\"\n      className={cn(\n        \"text-xs font-medium tracking-[0.16em] text-muted-foreground uppercase\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function HeroTitle({ className, ...props }: ComponentProps<\"h1\">) {\n  return (\n    // The headline is the caller's own text, passed in as children.\n    // oxlint-disable-next-line jsx-a11y/heading-has-content\n    <h1\n      data-slot=\"hero-title\"\n      className={cn(\n        \"max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function HeroDescription({ className, ...props }: ComponentProps<\"p\">) {\n  return (\n    <p\n      data-slot=\"hero-description\"\n      className={cn(\n        \"max-w-xl text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function HeroActions({ className, ...props }: ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"hero-actions\"\n      className={cn(\n        \"mt-2 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function HeroVisual({ className, ...props }: ComponentProps<\"div\">) {\n  // The frame, not the artwork: put whatever is really shipping inside it. A\n  // hero without a picture is a paragraph, and a fake dashboard is worse.\n  return (\n    <div\n      data-slot=\"hero-visual\"\n      className={cn(\n        \"mt-6 w-full max-w-3xl overflow-hidden rounded-xl border border-border bg-card text-left shadow-md\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/blocks/hero",
+  "meta": {
+    "tier": "free",
+    "kind": "block",
+    "category": "marketing",
+    "keywords": [
+      "hero",
+      "landing page",
+      "marketing header",
+      "above the fold",
+      "cta"
+    ]
+  }
+}

@@ -1,0 +1,544 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "forme",
+  "homepage": "https://formeui.com",
+  "items": [
+    {
+      "name": "forme-foundation",
+      "type": "registry:ui",
+      "title": "Forme foundation",
+      "description": "Design tokens, motion presets and the shared class-name helper every Forme component builds on.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "layout"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/foundation.css",
+          "type": "registry:component",
+          "target": "@components/forme/foundation.css"
+        },
+        {
+          "path": "registry/lib/motion.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/motion.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/docs/theming",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "layout",
+        "keywords": [
+          "theme",
+          "tokens",
+          "tailwind",
+          "css variables",
+          "theming"
+        ]
+      }
+    },
+    {
+      "name": "hero",
+      "type": "registry:block",
+      "title": "Hero",
+      "description": "A marketing hero with an eyebrow, a headline, a supporting paragraph, two calls to action and a frame for a real product screenshot. Every part is composed by you, so the section carries your copy instead of a placeholder.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "marketing"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/blocks/hero/hero.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/blocks/hero/hero.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/blocks/hero",
+      "meta": {
+        "tier": "free",
+        "kind": "block",
+        "category": "marketing",
+        "keywords": [
+          "hero",
+          "landing page",
+          "marketing header",
+          "above the fold",
+          "cta"
+        ]
+      }
+    },
+    {
+      "name": "pricing",
+      "type": "registry:block",
+      "title": "Pricing",
+      "description": "A pricing section with three tiers, a monthly and annual toggle the caller controls, and a featured tier marked by a stronger border and a small label rather than a coloured card. Each tier takes its own price, so the toggle is a few lines of your own state.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "commerce"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/blocks/pricing/pricing.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/blocks/pricing/pricing.tsx"
+        },
+        {
+          "path": "registry/components/badge/badge.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/badge/badge.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/blocks/pricing",
+      "meta": {
+        "tier": "free",
+        "kind": "block",
+        "category": "commerce",
+        "keywords": [
+          "pricing",
+          "plans",
+          "pricing table",
+          "billing toggle",
+          "subscription",
+          "checkout"
+        ]
+      }
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "A user image with a fallback that shows initials while the image loads, and when it never arrives at all. Built on the Base UI avatar primitive, so the image and the fallback swap without a flash of empty space.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "data-display"
+      ],
+      "dependencies": [
+        "@base-ui-components/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/avatar/avatar.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/avatar/avatar.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/avatar",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "data-display",
+        "keywords": [
+          "avatar",
+          "profile picture",
+          "user image",
+          "initials",
+          "fallback",
+          "shadcn avatar"
+        ]
+      }
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A small label for status, counts and metadata, in five quiet variants and two sizes. The colour lives in the tint so the text stays readable at eleven pixels, and an icon or a dot inside the badge carries the state at a glance.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/badge/badge.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/badge/badge.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/badge",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "data-display",
+        "keywords": [
+          "badge",
+          "chip",
+          "pill",
+          "status label",
+          "tag",
+          "shadcn badge"
+        ]
+      }
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "The primary action element. Four variants and three sizes, gradient primaries that crossfade on hover rather than snap, and an icon contract where the button owns the icon size.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "buttons"
+      ],
+      "dependencies": [
+        "@base-ui-components/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/button/button.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/button/button.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/button",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "buttons",
+        "keywords": [
+          "cta",
+          "action",
+          "submit",
+          "loading",
+          "asChild",
+          "gradient",
+          "icon",
+          "danger",
+          "link button",
+          "shadcn button"
+        ]
+      }
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A bordered surface with a header, title, description, content and footer you compose yourself, so a card is never more structure than the content inside it needs. Everything reads from the foundation tokens, which makes it retheme with the rest of the library.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "layout"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/card/card.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/card/card.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/card",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "layout",
+        "keywords": [
+          "card",
+          "panel",
+          "surface",
+          "container",
+          "section",
+          "shadcn card"
+        ]
+      }
+    },
+    {
+      "name": "command-menu",
+      "type": "registry:ui",
+      "title": "Command menu",
+      "description": "A command palette opened with ⌘K or Ctrl K, with a search field, grouped items, keyword matching and an empty state. Built on cmdk for the filtering and the keyboard path, inside a Radix dialog for the focus trap.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "navigation"
+      ],
+      "dependencies": [
+        "clsx",
+        "cmdk",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/command-menu/command-menu.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/command-menu/command-menu.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/command-menu",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "navigation",
+        "keywords": [
+          "command menu",
+          "command palette",
+          "cmdk",
+          "search dialog",
+          "keyboard shortcut",
+          "spotlight",
+          "shadcn command"
+        ]
+      }
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A modal built on the Base UI primitive, so the focus trap, the inert background, Esc to close and the return of focus all come from one well tested place. The backdrop fades and the panel scales in, both in and out, and everything comes from the foundation tokens.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "overlays"
+      ],
+      "dependencies": [
+        "@base-ui-components/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/dialog/dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/dialog/dialog.tsx"
+        },
+        {
+          "path": "registry/lib/as-child.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/as-child.ts"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/dialog",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "overlays",
+        "keywords": [
+          "dialog",
+          "modal",
+          "popup",
+          "backdrop",
+          "confirm",
+          "alert dialog",
+          "focus trap",
+          "shadcn dialog"
+        ]
+      }
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A text field with a real label, optional description, an error that is announced and wired up with aria-describedby, and room for an icon on either side. Sizes and the invalid state come from the same tokens as every other Forme surface.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "inputs"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/input/input.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/input/input.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/input",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "inputs",
+        "keywords": [
+          "text field",
+          "form input",
+          "textbox",
+          "field validation",
+          "error message",
+          "search input",
+          "shadcn input"
+        ]
+      }
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabs built on the Base UI primitive, so arrow keys, Home and End and the roving tab order come for free. The primitive measures the selected tab and publishes it as a CSS variable, so the underline glides without this component holding a single ref.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "navigation"
+      ],
+      "dependencies": [
+        "@base-ui-components/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/tabs/tabs.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/tabs/tabs.tsx"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/tabs",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "navigation",
+        "keywords": [
+          "tabs",
+          "tab bar",
+          "segmented control",
+          "animated underline",
+          "indicator",
+          "shadcn tabs"
+        ]
+      }
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A short description of a control, shown on hover and on keyboard focus, with an optional arrow. Built on the Base UI primitive and portalled so a tooltip is never clipped by the toolbar or table it belongs to.",
+      "author": "Forme UI <hello@formeui.com>",
+      "categories": [
+        "overlays"
+      ],
+      "dependencies": [
+        "@base-ui-components/react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://formeui.com/r/forme-foundation.json"
+      ],
+      "files": [
+        {
+          "path": "registry/components/tooltip/tooltip.tsx",
+          "type": "registry:component",
+          "target": "@components/forme/tooltip/tooltip.tsx"
+        },
+        {
+          "path": "registry/lib/as-child.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/as-child.ts"
+        },
+        {
+          "path": "registry/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/forme/lib/cn.ts"
+        }
+      ],
+      "docs": "Docs and live preview: https://formeui.com/components/tooltip",
+      "meta": {
+        "tier": "free",
+        "kind": "component",
+        "category": "overlays",
+        "keywords": [
+          "tooltip",
+          "hint",
+          "popover",
+          "aria-describedby",
+          "shadcn tooltip"
+        ]
+      }
+    }
+  ]
+}

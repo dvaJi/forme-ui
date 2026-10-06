@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabs",
+  "type": "registry:ui",
+  "title": "Tabs",
+  "description": "Tabs built on the Base UI primitive, so arrow keys, Home and End and the roving tab order come for free. The primitive measures the selected tab and publishes it as a CSS variable, so the underline glides without this component holding a single ref.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "navigation"
+  ],
+  "dependencies": [
+    "@base-ui-components/react",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/tabs/tabs.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/tabs/tabs.tsx",
+      "content": "\"use client\";\n\nimport { Tabs as TabsPrimitive } from \"@base-ui-components/react/tabs\";\nimport type { ComponentProps } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport function Tabs({ className, ...props }: ComponentProps<typeof TabsPrimitive.Root>) {\n  return (\n    <TabsPrimitive.Root\n      data-slot=\"tabs\"\n      className={cn(\"flex flex-col gap-4\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function TabsList({ className, ...props }: ComponentProps<typeof TabsPrimitive.List>) {\n  return (\n    <TabsPrimitive.List\n      data-slot=\"tabs-list\"\n      className={cn(\"relative inline-flex items-center gap-1 border-b border-border\", className)}\n      {...props}\n    />\n  );\n}\n\n/**\n * The underline.\n *\n * Base UI measures the selected tab and writes the result into CSS custom\n * properties — `--active-tab-left`, `--active-tab-width` and four more — so the\n * indicator positions itself from those. The previous version of this component\n * did that measurement itself: a `MutationObserver` watching `data-state` on the\n * triggers, because the list does not re-render when the selection moves. That\n * observer is the whole reason this file used to need `\"use client\"`, a `ref`, a\n * `ResizeObserver` and `motion`.\n *\n * Now the primitive owns the measurement and this is a positioned span with a\n * transition on `left` and `width`. Those two properties are animatable, so the\n * underline glides; the custom properties they read from are not animatable\n * themselves, and do not need to be.\n *\n * `renderBeforeHydration` so the underline is present on a server-rendered page\n * rather than appearing a frame late.\n */\nexport function TabsIndicator({\n  className,\n  ...props\n}: ComponentProps<typeof TabsPrimitive.Indicator>) {\n  return (\n    <TabsPrimitive.Indicator\n      data-slot=\"tabs-indicator\"\n      renderBeforeHydration\n      className={cn(\n        \"pointer-events-none absolute bottom-0 left-(--active-tab-left) h-0.5 w-(--active-tab-width) rounded-full bg-brand transition-[left,width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function TabsTrigger({ className, ...props }: ComponentProps<typeof TabsPrimitive.Tab>) {\n  return (\n    <TabsPrimitive.Tab\n      data-slot=\"tabs-trigger\"\n      // `data-active`, not `data-[state=active]`. Base UI publishes the selection\n      // as a boolean attribute rather than a state string, so the selector is\n      // both shorter and the thing the primitive actually guarantees.\n      className={cn(\n        \"rounded-sm px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground data-active:text-foreground disabled:pointer-events-none disabled:opacity-50\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function TabsContent({ className, ...props }: ComponentProps<typeof TabsPrimitive.Panel>) {\n  // `outline-none` because focus lands on the panel after a click, and a ring\n  // around the entire panel is not a useful focus indicator.\n  return (\n    <TabsPrimitive.Panel\n      data-slot=\"tabs-content\"\n      className={cn(\"outline-none\", className)}\n      {...props}\n    />\n  );\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/tabs",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "navigation",
+    "keywords": [
+      "tabs",
+      "tab bar",
+      "segmented control",
+      "animated underline",
+      "indicator",
+      "shadcn tabs"
+    ]
+  }
+}

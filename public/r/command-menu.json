@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "command-menu",
+  "type": "registry:ui",
+  "title": "Command menu",
+  "description": "A command palette opened with ⌘K or Ctrl K, with a search field, grouped items, keyword matching and an empty state. Built on cmdk for the filtering and the keyboard path, inside a Radix dialog for the focus trap.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "navigation"
+  ],
+  "dependencies": [
+    "clsx",
+    "cmdk",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/command-menu/command-menu.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/command-menu/command-menu.tsx",
+      "content": "\"use client\";\n\nimport {\n  CommandDialog,\n  CommandEmpty,\n  CommandGroup,\n  CommandInput,\n  CommandItem,\n  CommandList,\n  CommandSeparator,\n} from \"cmdk\";\nimport type { ComponentProps, ReactNode } from \"react\";\nimport { useCallback, useEffect, useState } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport interface CommandMenuProps {\n  /** Names the palette for screen readers. */\n  label?: string;\n  children: ReactNode;\n  /**\n   * Pass these when the items need to close the palette on select. Left out,\n   * the menu keeps its own state and closes on Esc or a click outside.\n   */\n  open?: boolean;\n  onOpenChange?: (open: boolean) => void;\n}\n\nexport function CommandMenu({\n  label = \"Command menu\",\n  open,\n  onOpenChange,\n  children,\n}: CommandMenuProps) {\n  const [internalOpen, setInternalOpen] = useState(false);\n  const isOpen = open ?? internalOpen;\n\n  const setOpen = useCallback(\n    (next: boolean) => {\n      setInternalOpen(next);\n      onOpenChange?.(next);\n    },\n    [onOpenChange],\n  );\n\n  useEffect(() => {\n    function onKeyDown(event: KeyboardEvent) {\n      const isPaletteKey = event.key.toLowerCase() === \"k\" && (event.metaKey || event.ctrlKey);\n      if (!isPaletteKey || event.altKey || event.repeat) return;\n      event.preventDefault();\n      setOpen(!isOpen);\n    }\n\n    window.addEventListener(\"keydown\", onKeyDown);\n    return () => window.removeEventListener(\"keydown\", onKeyDown);\n  }, [isOpen, setOpen]);\n\n  return (\n    <CommandDialog\n      open={isOpen}\n      onOpenChange={setOpen}\n      label={label}\n      overlayClassName=\"fixed inset-0 z-50 bg-foreground/25 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in\"\n      contentClassName=\"fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in\"\n    >\n      {children}\n    </CommandDialog>\n  );\n}\n\nexport function CommandMenuInput({\n  className,\n  children,\n  ...props\n}: ComponentProps<typeof CommandInput>) {\n  return (\n    <div className=\"flex items-center gap-2.5 border-b border-border px-3.5\">\n      <svg viewBox=\"0 0 16 16\" aria-hidden=\"true\" className=\"size-4 shrink-0 text-muted-foreground\">\n        <circle cx=\"7\" cy=\"7\" r=\"4.25\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" />\n        <path d=\"m10.5 10.5 3 3\" stroke=\"currentColor\" strokeLinecap=\"round\" strokeWidth=\"1.5\" />\n      </svg>\n      <CommandInput\n        data-slot=\"command-menu-input\"\n        className={cn(\n          \"flex h-12 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground\",\n          className,\n        )}\n        {...props}\n      />\n      {children ?? (\n        <kbd className=\"hidden shrink-0 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] text-muted-foreground sm:block\">\n          Esc\n        </kbd>\n      )}\n    </div>\n  );\n}\n\nexport function CommandMenuList({ className, ...props }: ComponentProps<typeof CommandList>) {\n  return (\n    <CommandList\n      data-slot=\"command-menu-list\"\n      className={cn(\"max-h-80 overflow-x-hidden overflow-y-auto p-2\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function CommandMenuEmpty({ className, ...props }: ComponentProps<typeof CommandEmpty>) {\n  return (\n    <CommandEmpty\n      data-slot=\"command-menu-empty\"\n      className={cn(\"py-8 text-center text-sm text-muted-foreground\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function CommandMenuGroup({ className, ...props }: ComponentProps<typeof CommandGroup>) {\n  return (\n    <CommandGroup\n      data-slot=\"command-menu-group\"\n      className={cn(\n        \"overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function CommandMenuSeparator({\n  className,\n  ...props\n}: ComponentProps<typeof CommandSeparator>) {\n  return (\n    <CommandSeparator\n      data-slot=\"command-menu-separator\"\n      className={cn(\"-mx-1 my-1 h-px bg-border\", className)}\n      {...props}\n    />\n  );\n}\n\nexport function CommandMenuItem({ className, ...props }: ComponentProps<typeof CommandItem>) {\n  return (\n    <CommandItem\n      data-slot=\"command-menu-item\"\n      className={cn(\n        \"flex cursor-default items-center gap-2.5 rounded-md px-2 py-2 text-sm outline-none select-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/command-menu",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "navigation",
+    "keywords": [
+      "command menu",
+      "command palette",
+      "cmdk",
+      "search dialog",
+      "keyboard shortcut",
+      "spotlight",
+      "shadcn command"
+    ]
+  }
+}

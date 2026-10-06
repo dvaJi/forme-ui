@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input",
+  "type": "registry:ui",
+  "title": "Input",
+  "description": "A text field with a real label, optional description, an error that is announced and wired up with aria-describedby, and room for an icon on either side. Sizes and the invalid state come from the same tokens as every other Forme surface.",
+  "author": "Forme UI <hello@formeui.com>",
+  "categories": [
+    "inputs"
+  ],
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "https://formeui.com/r/forme-foundation.json"
+  ],
+  "files": [
+    {
+      "path": "registry/components/input/input.tsx",
+      "type": "registry:component",
+      "target": "@components/forme/input/input.tsx",
+      "content": "\"use client\";\n\nimport type { InputHTMLAttributes, ReactNode } from \"react\";\nimport { useId } from \"react\";\n\nimport { cn } from \"../lib/cn\";\n\nexport type InputSize = \"md\" | \"lg\";\n\nexport interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, \"size\"> {\n  /**\n   * Visible label. Required rather than optional: an unlabelled field is a\n   * mystery to anyone using a screen reader, and a placeholder is not a label.\n   */\n  label: string;\n  /** Help text under the field. Replaced by `error` when there is one. */\n  description?: ReactNode;\n  /** Marks the field invalid and is announced as soon as it appears. */\n  error?: string;\n  /**\n   * Sits inside the field before the text. Decorative and unclickable, so it is\n   * hidden from assistive technology; use `trailing` for anything a person has\n   * to reach.\n   */\n  leading?: ReactNode;\n  /** Sits inside the field after the text. Buttons are allowed. */\n  trailing?: ReactNode;\n  size?: InputSize;\n}\n\nconst controls = {\n  md: \"h-9 px-3 text-sm\",\n  lg: \"h-11 px-3.5 text-[0.9375rem]\",\n} satisfies Record<InputSize, string>;\n\nconst adornment = \"absolute top-1/2 -translate-y-1/2 text-muted-foreground [&_svg]:size-4\";\n\nexport function Input({\n  label,\n  description,\n  error,\n  leading,\n  trailing,\n  size = \"md\",\n  className,\n  id,\n  ...props\n}: InputProps) {\n  const generatedId = useId();\n  const inputId = id ?? generatedId;\n  const descriptionId = `${inputId}-description`;\n  const errorId = `${inputId}-error`;\n\n  // The error is the description once it exists: reading both would only say the\n  // same thing twice, and the invalid state is what the person needs to hear.\n  const describedBy = error ? errorId : description ? descriptionId : undefined;\n\n  return (\n    <div className=\"flex flex-col gap-1.5\">\n      <label htmlFor={inputId} className=\"text-sm font-medium leading-none\">\n        {label}\n      </label>\n\n      <div className=\"relative flex items-center\">\n        {leading ? (\n          <span aria-hidden=\"true\" className={cn(adornment, \"pointer-events-none left-2.5\")}>\n            {leading}\n          </span>\n        ) : null}\n\n        <input\n          id={inputId}\n          data-slot=\"input\"\n          aria-invalid={error ? true : undefined}\n          aria-describedby={describedBy}\n          className={cn(\n            \"w-full rounded-md border border-input bg-background text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive\",\n            controls[size],\n            leading && \"pl-9\",\n            trailing && \"pr-9\",\n            className,\n          )}\n          {...props}\n        />\n\n        {trailing ? <span className={cn(adornment, \"right-2.5\")}>{trailing}</span> : null}\n      </div>\n\n      {error ? (\n        <p id={errorId} role=\"alert\" className=\"text-xs text-destructive\">\n          {error}\n        </p>\n      ) : description ? (\n        <p id={descriptionId} className=\"text-xs text-muted-foreground\">\n          {description}\n        </p>\n      ) : null}\n    </div>\n  );\n}\n\nexport default Input;\n"
+    },
+    {
+      "path": "registry/lib/cn.ts",
+      "type": "registry:lib",
+      "target": "@components/forme/lib/cn.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { extendTailwindMerge } from \"tailwind-merge\";\n\n/**\n * Forme's type styles, so tailwind-merge stops treating them as colours.\n *\n * The bug this prevents, which was live in this file for a while and is\n * invisible in the source: `tailwind-merge` has no view of a Tailwind theme. Any\n * `text-*` utility it does not recognise as one of Tailwind's built-in font sizes\n * is assumed to be a text **colour**. So on a button whose classes were\n * `p-2 text-body bg-button-primary text-white`, it saw two text-colours, applied\n * last-write-wins, and silently dropped `text-body`. The class was in the source,\n * the utility was in the stylesheet, the DOM had it on the element — and the\n * button rendered at 16px instead of 14px. Nothing errored.\n *\n * Registering them under `font-size` is the fix, and every name added to\n * typography.css has to be added here too. That duplication is the price: the\n * alternative is a type utility that a caller can delete by accident.\n *\n * If you rename or add a type style in foundation.css, mirror it in this list.\n */\nconst TEXT_FAMILIES = [\n  \"body\",\n  \"body-2\",\n  \"caption-1\",\n  \"caption-2\",\n  \"title-1\",\n  \"title-2\",\n  \"title-3\",\n  \"headline\",\n] as const;\n\nconst TEXT_WEIGHTS = [\"regular\", \"medium\", \"semibold\", \"bold\"] as const;\n\nconst TEXT_STYLES = TEXT_FAMILIES.flatMap((family) =>\n  TEXT_WEIGHTS.map((weight) => `${family}-${weight}`),\n);\n\nconst merge = extendTailwindMerge({\n  extend: {\n    classGroups: {\n      \"font-size\": [{ text: TEXT_STYLES }],\n    },\n  },\n});\n\n/**\n * Merges class names, letting a caller's `className` win over a component's\n * defaults. Without the merge step a `px-4` from the component and a `px-6` from\n * the caller would both reach the browser and the winner would be whichever came\n * last in the stylesheet rather than whichever the caller meant.\n */\nexport function cn(...inputs: ClassValue[]): string {\n  return merge(clsx(inputs));\n}\n"
+    }
+  ],
+  "docs": "Docs and live preview: https://formeui.com/components/input",
+  "meta": {
+    "tier": "free",
+    "kind": "component",
+    "category": "inputs",
+    "keywords": [
+      "text field",
+      "form input",
+      "textbox",
+      "field validation",
+      "error message",
+      "search input",
+      "shadcn input"
+    ]
+  }
+}

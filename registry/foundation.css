@@ -1,0 +1,690 @@
+/**
+ * Forme foundation.
+ *
+ * Install this file once, then import it after Tailwind in your global stylesheet:
+ *
+ *   @import "tailwindcss";
+ *   @import "./components/forme/foundation.css";
+ *
+ * Every Forme component reads these tokens and nothing else, so retheming the
+ * whole library is editing the variables below. The shadcn slots — background,
+ * foreground, card, primary, muted, border, ring — keep their conventional names
+ * so an existing shadcn theme slots straight in.
+ *
+ * Three layers, and the order matters:
+ *
+ *   1. Primitives. Raw ramps. Nothing renders from these directly.
+ *   2. Semantics. What a *role* means: primary, surface, border, ghost.
+ *   3. Utilities. The few things CSS cannot express as a plain background-image,
+ *      which is why the button gradients live here and not on the component.
+ *
+ * On the gradients, since they are the one place this file does something
+ * unusual: a hover gradient cannot be animated, because `background-image` is not
+ * an interpolable property. Swapping it on `:hover` makes the button snap. So
+ * both gradients live on the element at once — the resting one on the element, the
+ * hover one on a `::before` whose opacity fades between them. That is why
+ * `bg-button-primary` sets `isolation: isolate` and its `::before` a negative
+ * z-index: the layer has to sit behind the label without being reparented, or the
+ * text would paint under it.
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: light;
+
+  /* --- 1. Primitives ----------------------------------------------------- */
+
+  /* The accent is the CTA hue: primary buttons, focus, selection, and every
+     interactive surface. One hue for all of them, so colour means "this responds
+     to you" rather than "this is a category". */
+  --blue-50: oklch(97% 0.014 254);
+  --blue-100: oklch(93% 0.032 255);
+  --blue-200: oklch(88% 0.059 254);
+  --blue-300: oklch(82% 0.093 253);
+  --blue-400: oklch(70% 0.15 255);
+  --blue-500: oklch(62% 0.19 256);
+  --blue-600: oklch(55% 0.21 258);
+  --blue-700: oklch(48% 0.21 260);
+  --blue-800: oklch(42% 0.18 261);
+  --blue-900: oklch(37% 0.15 262);
+  --blue-950: oklch(28% 0.11 262);
+
+  --red-50: oklch(97% 0.013 17);
+  --red-100: oklch(93% 0.032 18);
+  --red-200: oklch(88% 0.062 19);
+  --red-300: oklch(81% 0.11 20);
+  --red-400: oklch(70% 0.17 22);
+  --red-500: oklch(63% 0.2 25);
+  --red-600: oklch(58% 0.21 27);
+  --red-700: oklch(51% 0.19 27);
+
+  /* Neutrals carry a trace of the accent hue. A pure grey next to a blue button
+     reads as dirty rather than as quiet. */
+  --neutral-50: oklch(99% 0.002 265);
+  --neutral-100: oklch(97.5% 0.002 265);
+  --neutral-200: oklch(92.5% 0.003 265);
+  --neutral-300: oklch(87% 0.004 265);
+  --neutral-400: oklch(70% 0.006 265);
+  --neutral-500: oklch(58% 0.008 265);
+  --neutral-600: oklch(48% 0.01 265);
+  --neutral-700: oklch(38% 0.012 265);
+  --neutral-800: oklch(28% 0.012 265);
+  --neutral-900: oklch(21% 0.012 265);
+  --neutral-950: oklch(15% 0.01 265);
+
+  /* --- 2. Semantics: the shadcn slots ------------------------------------ */
+
+  --background: var(--neutral-50);
+  --foreground: var(--neutral-950);
+  --card: var(--neutral-100);
+  --card-foreground: var(--foreground);
+  --popover: var(--neutral-100);
+  --popover-foreground: var(--foreground);
+
+  /* Primary is the accent, not ink. A filled primary is the loudest thing on a
+     screen and should look like the decision it is. */
+  --primary: var(--blue-600);
+  --primary-foreground: var(--neutral-50);
+  --secondary: var(--neutral-200);
+  --secondary-foreground: var(--neutral-950);
+  --muted: var(--neutral-200);
+  --muted-foreground: var(--neutral-500);
+  --accent: var(--blue-100);
+  --accent-foreground: var(--blue-700);
+
+  /* Text roles. Four steps, because a UI needs a heading that is not a label and
+     a caption that is not body copy. */
+  --text-primary: var(--neutral-950);
+  --text-secondary: var(--neutral-700);
+  --text-tertiary: var(--neutral-400);
+  --text-disabled: var(--neutral-400);
+
+  /* Surfaces for controls that sit on the page rather than in a panel. */
+  --surface-default: var(--neutral-100);
+  --surface-hover: var(--neutral-200);
+  --surface-active: var(--neutral-300);
+  --surface-disabled: var(--neutral-100);
+
+  /* Control borders, which need their own ramp: a border on a hovered control has
+     to move, and borrowing `border` for that would make every hairline in the
+     product shift when a button is touched. */
+  --control-border: var(--neutral-200);
+  --control-border-hover: var(--neutral-300);
+  --control-border-active: var(--neutral-400);
+  --focus-ring: var(--blue-500);
+
+  /* Ghost buttons are tinted, not grey. A ghost action that is still an action
+     should be recognisable as interactive before it is hovered. */
+  --ghost-background: var(--blue-100);
+  --ghost-hover: var(--blue-200);
+  --ghost-active: var(--blue-300);
+  --ghost-foreground: var(--blue-700);
+  --ghost-disabled: var(--blue-50);
+  --ghost-disabled-foreground: var(--blue-300);
+
+  --brand: var(--blue-600);
+  --brand-strong: var(--blue-700);
+  --brand-foreground: var(--neutral-50);
+  --brand-subtle: var(--blue-100);
+
+  --destructive: var(--red-600);
+  --destructive-foreground: var(--neutral-50);
+  --success: oklch(55% 0.13 155);
+  --warning: oklch(70% 0.14 75);
+
+  /* Chart series colours. A categorical ramp, ordered so that adjacent slots stay
+     distinguishable and so that no two neighbours share a hue family.
+
+     These are deliberately *not* derived from the accent. A chart that paints its
+     series in shades of the interactive blue makes the data look like it belongs
+     to the UI — every bar reads as "a button", and the one series the reader is
+     meant to care about has to fight the brand for attention. Data gets its own
+     palette; the accent stays for things you can click.
+
+     Slots are used in order, so `chart-1` is the first series, and the ramp is
+     spaced far enough apart that slots 1, 2 and 3 survive being adjacent at
+     2px-wide in a stacked bar. */
+  --chart-1: oklch(62% 0.19 256); /* blue — the accent, deliberately reused here */
+  --chart-2: oklch(64% 0.17 172); /* teal */
+  --chart-3: oklch(68% 0.16 62); /* amber */
+  --chart-4: oklch(58% 0.2 305); /* violet */
+  --chart-5: oklch(63% 0.19 25); /* red */
+  --chart-6: oklch(66% 0.15 130); /* green */
+  --chart-7: oklch(70% 0.12 215); /* sky */
+  --chart-8: oklch(72% 0.11 330); /* pink */
+
+  --border: var(--neutral-200);
+  --input: var(--neutral-300);
+  --ring: var(--blue-500);
+
+  /* --- 3. Radii, shadows, motion ----------------------------------------- */
+
+  /* 4 / 6 / 8 / 10 / 12 / 16. The step between 8 and 10 is `--radius-2lg`, and
+     it exists because medium buttons and cards want 10: large enough to read as a
+     deliberate radius, small enough that a dense dashboard does not turn into a
+     field of pills. Jumping 8 to 12 instead would put every 36px control on the
+     same radius as a whole panel, and the two stop being distinguishable. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-2lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  /* Shadows describe height. Two layers each, because a single soft shadow reads
+     as a smudge on a light background rather than as an edge. */
+  --shadow-2xs: 0 1px 1px 0 oklch(0% 0 0 / 0.05);
+  --shadow-xs: 0 1px 2px 0 oklch(0% 0 0 / 0.06), 0 1px 3px 0 oklch(0% 0 0 / 0.04);
+  --shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.06), 0 1px 3px 0 oklch(0% 0 0 / 0.1);
+  --shadow-md: 0 2px 4px -1px oklch(0% 0 0 / 0.06), 0 4px 6px -1px oklch(0% 0 0 / 0.1);
+  --shadow-lg: 0 4px 6px -2px oklch(0% 0 0 / 0.05), 0 10px 15px -3px oklch(0% 0 0 / 0.1);
+  --shadow-xl: 0 10px 10px -5px oklch(0% 0 0 / 0.04), 0 20px 25px -5px oklch(0% 0 0 / 0.1);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --duration-instant: 90ms;
+  --duration-fast: 150ms;
+  --duration-standard: 240ms;
+
+  /* The gradient crossfade. Matched to --duration-fast so a button and a text
+     link transition at the same speed across the library. */
+  --button-transition-ms: 150ms;
+
+  /* --- Button gradients -------------------------------------------------- */
+
+  /* Light stop at the top, dark at the bottom. The 180° is what makes a button
+     look lit from above instead of painted. */
+  --gradient-primary-default: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-600) 100%);
+  --gradient-primary-hover: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-500) 100%);
+  --gradient-primary-active: linear-gradient(180deg, var(--blue-600) 0%, var(--blue-700) 100%);
+  --gradient-primary-disabled: linear-gradient(
+    180deg,
+    var(--neutral-200) 0%,
+    var(--neutral-300) 100%
+  );
+
+  --gradient-danger-default: linear-gradient(180deg, var(--red-500) 0%, var(--red-600) 100%);
+  --gradient-danger-hover: linear-gradient(180deg, var(--red-400) 0%, var(--red-500) 100%);
+  --gradient-danger-active: linear-gradient(180deg, var(--red-600) 0%, var(--red-700) 100%);
+  --gradient-danger-disabled: linear-gradient(180deg, var(--red-100) 0%, var(--red-200) 100%);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: var(--neutral-950);
+  --foreground: var(--neutral-50);
+  /* Cards lift off the background rather than sitting in it. On a dark page the
+     surface that reads as "elevated" is the lighter one. */
+  --card: var(--neutral-900);
+  --card-foreground: var(--foreground);
+  --popover: var(--neutral-900);
+  --popover-foreground: var(--foreground);
+
+  --primary: var(--blue-500);
+  --primary-foreground: var(--neutral-950);
+  --secondary: var(--neutral-800);
+  --secondary-foreground: var(--neutral-50);
+  --muted: var(--neutral-800);
+  --muted-foreground: var(--neutral-400);
+  --accent: var(--blue-900);
+  --accent-foreground: var(--blue-100);
+
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-300);
+  --text-tertiary: var(--neutral-600);
+  --text-disabled: var(--neutral-600);
+
+  --surface-default: var(--neutral-800);
+  --surface-hover: oklch(38% 0.012 265 / 0.6);
+  --surface-active: var(--neutral-800);
+  --surface-disabled: var(--neutral-800);
+
+  --control-border: var(--neutral-700);
+  --control-border-hover: var(--neutral-500);
+  --control-border-active: var(--neutral-600);
+  --focus-ring: var(--blue-500);
+
+  --ghost-background: var(--blue-900);
+  --ghost-hover: var(--blue-800);
+  --ghost-active: var(--blue-700);
+  --ghost-foreground: var(--blue-300);
+  --ghost-disabled: var(--neutral-800);
+  --ghost-disabled-foreground: var(--neutral-600);
+
+  --brand: var(--blue-500);
+  --brand-strong: var(--blue-400);
+  --brand-foreground: var(--neutral-950);
+  --brand-subtle: var(--blue-900);
+
+  --destructive: var(--red-500);
+  --destructive-foreground: var(--neutral-50);
+  --success: oklch(70% 0.14 155);
+  --warning: oklch(78% 0.13 75);
+
+  --border: var(--neutral-800);
+  --input: var(--neutral-700);
+  --ring: var(--blue-500);
+
+  --shadow-2xs: 0 1px oklch(0% 0 0 / 0.16);
+  --shadow-xs: 0 1px 2px 0 oklch(0% 0 0 / 0.18);
+
+  /* The chart ramp shifts up a step in the dark, for the same reason the button
+     gradients do: a colour chosen to sit on white has to travel lighter to sit on
+     near-black, or it reads as a hole rather than as a series. */
+  --chart-1: oklch(70% 0.16 256);
+  --chart-2: oklch(73% 0.14 172);
+  --chart-3: oklch(76% 0.14 62);
+  --chart-4: oklch(67% 0.17 305);
+  --chart-5: oklch(70% 0.16 25);
+  --chart-6: oklch(73% 0.13 130);
+  --chart-7: oklch(78% 0.11 215);
+  --chart-8: oklch(78% 0.1 330);
+  --shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.12), 0 1px 3px 0 oklch(0% 0 0 / 0.16);
+  --shadow-md: 0 2px 4px -1px oklch(0% 0 0 / 0.12), 0 4px 6px -1px oklch(0% 0 0 / 0.18);
+  --shadow-lg: 0 4px 6px -2px oklch(0% 0 0 / 0.1), 0 10px 15px -3px oklch(0% 0 0 / 0.18);
+  --shadow-xl: 0 10px 10px -5px oklch(0% 0 0 / 0.08), 0 20px 25px -5px oklch(0% 0 0 / 0.2);
+
+  /* Dark-mode gradients shift *up* a step rather than down: on a dark page the
+     lit edge belongs at the top, so the lighter stop has to be the stronger
+     one, or the button reads as a hole. */
+  --gradient-primary-default: linear-gradient(180deg, var(--blue-400) 0%, var(--blue-600) 100%);
+  --gradient-primary-hover: linear-gradient(180deg, var(--blue-300) 0%, var(--blue-500) 100%);
+  --gradient-primary-active: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-700) 100%);
+  --gradient-primary-disabled: linear-gradient(
+    180deg,
+    var(--neutral-800) 0%,
+    var(--neutral-700) 100%
+  );
+
+  --gradient-danger-default: linear-gradient(180deg, var(--red-400) 0%, var(--red-600) 100%);
+  --gradient-danger-hover: linear-gradient(180deg, var(--red-300) 0%, var(--red-500) 100%);
+  --gradient-danger-active: linear-gradient(180deg, var(--red-500) 0%, var(--red-700) 100%);
+  --gradient-danger-disabled: linear-gradient(
+    180deg,
+    oklch(28% 0.06 25) 0%,
+    oklch(24% 0.05 25) 100%
+  );
+}
+
+/*
+ * Tailwind reads these to build the utilities Forme's components use. A consumer
+ * only ever edits the variables above; this block is what turns them into
+ * `bg-background`, `text-muted-foreground`, `border-border` and the rest.
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disabled: var(--text-disabled);
+
+  --color-surface: var(--surface-default);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-surface-disabled: var(--surface-disabled);
+
+  --color-control-border: var(--control-border);
+  --color-control-border-hover: var(--control-border-hover);
+  --color-control-border-active: var(--control-border-active);
+
+  --color-ghost: var(--ghost-background);
+  --color-ghost-hover: var(--ghost-hover);
+  --color-ghost-active: var(--ghost-active);
+  --color-ghost-disabled: var(--ghost-disabled);
+  --color-ghost-foreground: var(--ghost-foreground);
+  --color-ghost-disabled-foreground: var(--ghost-disabled-foreground);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* Series colours, one slot per position so a chart can cycle them by index
+     rather than hard-coding hex values in a component. */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-focus-ring: var(--focus-ring);
+
+  --radius-xs: var(--radius-sm);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-2lg: var(--radius-2lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+
+  /* The type scale, as composite utilities: `<family>-<weight>`, so
+     `text-body-medium` rather than `text-sm font-medium`.
+
+     Named for size and weight rather than for a role, because the same size is a
+     label in one place and body copy in another and the difference is context,
+     not font.
+
+     The line-heights are the part that matters and the part that is easy to get
+     wrong. `body` is 14px on a **20px** line, not 14px on a 22px one: a medium
+     button is 36px tall with 8px of padding, which leaves exactly 20px of content
+     box. A 22px line box overflows that by 2px and gets clipped by the button's
+     `overflow-hidden`, which shows up as text sitting slightly too low and looking
+     subtly cramped rather than as anything obviously broken.
+
+     Captions carry a little positive tracking, which is what keeps 12px text
+     legible — negative tracking at that size closes the counters. */
+  --text-body-regular: 0.875rem;
+  --text-body-regular--line-height: 1.25rem;
+  --text-body-regular--font-weight: 400;
+  --text-body-medium: 0.875rem;
+  --text-body-medium--line-height: 1.25rem;
+  --text-body-medium--font-weight: 500;
+  --text-body-semibold: 0.875rem;
+  --text-body-semibold--line-height: 1.25rem;
+  --text-body-semibold--font-weight: 600;
+  --text-body-bold: 0.875rem;
+  --text-body-bold--line-height: 1.25rem;
+  --text-body-bold--font-weight: 700;
+
+  --text-body-2-regular: 0.8125rem;
+  --text-body-2-regular--line-height: 1.125rem;
+  --text-body-2-regular--font-weight: 400;
+  --text-body-2-medium: 0.8125rem;
+  --text-body-2-medium--line-height: 1.125rem;
+  --text-body-2-medium--font-weight: 500;
+  --text-body-2-semibold: 0.8125rem;
+  --text-body-2-semibold--line-height: 1.125rem;
+  --text-body-2-semibold--font-weight: 600;
+
+  --text-caption-1-regular: 0.75rem;
+  --text-caption-1-regular--line-height: 1rem;
+  --text-caption-1-regular--letter-spacing: 0.15px;
+  --text-caption-1-regular--font-weight: 400;
+  --text-caption-1-medium: 0.75rem;
+  --text-caption-1-medium--line-height: 1rem;
+  --text-caption-1-medium--letter-spacing: 0.15px;
+  --text-caption-1-medium--font-weight: 500;
+  --text-caption-1-semibold: 0.75rem;
+  --text-caption-1-semibold--line-height: 1rem;
+  --text-caption-1-semibold--letter-spacing: 0.15px;
+  --text-caption-1-semibold--font-weight: 600;
+  --text-caption-1-bold: 0.75rem;
+  --text-caption-1-bold--line-height: 1rem;
+  --text-caption-1-bold--letter-spacing: 0.15px;
+  --text-caption-1-bold--font-weight: 700;
+
+  --text-caption-2-regular: 0.6875rem;
+  --text-caption-2-regular--line-height: 0.9375rem;
+  --text-caption-2-regular--letter-spacing: 0.2px;
+  --text-caption-2-regular--font-weight: 400;
+  --text-caption-2-medium: 0.6875rem;
+  --text-caption-2-medium--line-height: 0.9375rem;
+  --text-caption-2-medium--letter-spacing: 0.2px;
+  --text-caption-2-medium--font-weight: 500;
+  --text-caption-2-semibold: 0.6875rem;
+  --text-caption-2-semibold--line-height: 0.9375rem;
+  --text-caption-2-semibold--letter-spacing: 0.2px;
+  --text-caption-2-semibold--font-weight: 600;
+
+  --text-title-1-semibold: 1.0625rem;
+  --text-title-1-semibold--line-height: 1.5rem;
+  --text-title-1-semibold--font-weight: 600;
+  --text-title-1-bold: 1.0625rem;
+  --text-title-1-bold--line-height: 1.5rem;
+  --text-title-1-bold--font-weight: 700;
+  --text-title-2-semibold: 0.9375rem;
+  --text-title-2-semibold--line-height: 1.375rem;
+  --text-title-2-semibold--font-weight: 600;
+  --text-title-2-bold: 0.9375rem;
+  --text-title-2-bold--line-height: 1.375rem;
+  --text-title-2-bold--font-weight: 700;
+  --text-title-3-semibold: 0.8125rem;
+  --text-title-3-semibold--line-height: 1.25rem;
+  --text-title-3-semibold--font-weight: 600;
+  --text-headline-medium: 1.3125rem;
+  --text-headline-medium--line-height: 1.75rem;
+  --text-headline-medium--font-weight: 500;
+  --text-headline-semibold: 1.3125rem;
+  --text-headline-semibold--line-height: 1.75rem;
+  --text-headline-semibold--font-weight: 600;
+
+  --animate-fade-in: fade-in var(--duration-standard) var(--ease-entrance);
+  --animate-fade-out: fade-out var(--duration-fast) var(--ease-exit);
+  --animate-slide-up: slide-up var(--duration-standard) var(--ease-entrance);
+  --animate-pop-in: pop-in var(--duration-fast) var(--ease-entrance);
+  --animate-pop-out: pop-out var(--duration-fast) var(--ease-exit);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+}
+
+/* --- Utilities ----------------------------------------------------------- */
+
+/**
+ * The shared transition for interactive surfaces.
+ *
+ * Background, border, colour and shadow together, because a control where only
+ * some of them move reads as two controls rather than one in two states.
+ */
+@utility button-press-motion {
+  transition-property: background-color, border-color, box-shadow, color, opacity;
+  transition-duration: var(--button-transition-ms);
+  transition-timing-function: ease;
+}
+
+/**
+ * The primary gradient, with a crossfading hover.
+ *
+ * Both gradients are present at once: the resting one on the element, the hover
+ * one on `::before`. `background-image` cannot be interpolated, so swapping it on
+ * `:hover` would snap — and a button that snaps looks like a different component
+ * being swapped in under the cursor.
+ *
+ * `isolation: isolate` plus a negative z-index on the pseudo-element keeps the
+ * hover layer behind the label without moving the label in the DOM. The element
+ * needs `position: relative` for this to anchor; the components that use this
+ * utility set it.
+ */
+@utility bg-button-primary {
+  position: relative;
+  isolation: isolate;
+  background-image: var(--gradient-primary-default);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--gradient-primary-hover);
+    opacity: 0;
+    transition: opacity var(--button-transition-ms) ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  /* Active and disabled swap the element gradient outright. By then the pointer
+     is already down or gone, so nothing is left to crossfade for. */
+  &:active {
+    background-image: var(--gradient-primary-active);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    background-image: var(--gradient-primary-disabled);
+    &::before {
+      opacity: 0;
+    }
+  }
+}
+
+@utility bg-button-danger {
+  position: relative;
+  isolation: isolate;
+  background-image: var(--gradient-danger-default);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--gradient-danger-hover);
+    opacity: 0;
+    transition: opacity var(--button-transition-ms) ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:active {
+    background-image: var(--gradient-danger-active);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    background-image: var(--gradient-danger-disabled);
+    &::before {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* For panels that carry the page while they are open: dialogs, command menus.
+   Scale rather than slide, because the panel is already centred. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* The one shimmer in the system, for skeletons and loading rows. */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Focus is always visible, and always the same. Never remove this. The
+     outline follows the element's own radius, so no radius is set here. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--brand-subtle);
+    color: var(--brand-strong);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
